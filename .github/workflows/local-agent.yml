@@ -1,0 +1,27 @@
+# Runs on every push and pull request.
+# Jobs are queued on GitHub, then claimed by your local self-hosted runner
+# (label: local-agent). When the agent script exits 0, the check turns green.
+name: Local Agent
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  agent:
+    name: Run local agent
+    runs-on: [self-hosted, local-agent]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run agent
+        run: bash agent/run.sh
+        env:
+          AGENT_EVENT: ${{ github.event_name }}
+          AGENT_SHA: ${{ github.sha }}
+          AGENT_REF: ${{ github.ref }}
+          AGENT_REPO: ${{ github.repository }}
+          AGENT_ACTOR: ${{ github.actor }}
+          AGENT_RUN_ID: ${{ github.run_id }}
+          AGENT_RUN_ATTEMPT: ${{ github.run_attempt }}
